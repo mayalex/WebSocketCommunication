@@ -3,13 +3,12 @@ import React, { Component } from 'react';
 export class GetData extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: [] };
-
+        this.state = { tableRows: [] };
     }
 
     componentWillMount() {
         var getWebSocketMessages = onMessageReceived => {
-            var url = `ws://${window.location.host}/api/SampleData`
+            var url = `ws://${window.location.host}/api/SampleData`;
 
             var webSocket = new WebSocket(url);
 
@@ -17,30 +16,38 @@ export class GetData extends Component {
         };
 
         getWebSocketMessages(message => {
-            let data = this.state.data;
-            data.push(message.data)
-            this.setState({ data });
+            if (message.data) {
+                let tableRows = this.state.tableRows;
+                tableRows.push(JSON.parse(message.data));
+                this.setState({ tableRows });
+            }
         });
     }
-    renderTable = (data) => {
-        return (
-            <table className='table'>
-                <tbody>
-                    {data.map(item =>
-                        <tr key={item}>
-                            <td>{item}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        );
-    }
+    renderTableRows = data => {
+        return data
+            ? data.map(row => (
+                  <tr key={row[0]}>
+                      <td>{row[0]}</td>
+                      <td>{row[1]}</td>
+                      <td>{row[2]}</td>
+                  </tr>
+              ))
+            : null;
+    };
 
     render() {
-
         return (
             <React.Fragment>
-                {this.renderTable(this.state.data)}
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Data col 1</th>
+                            <th>Data row 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>{this.renderTableRows(this.state.tableRows)}</tbody>
+                </table>
             </React.Fragment>
         );
     }

@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebSocketCommunication.Models;
+using Newtonsoft.Json;
 
 namespace WebSocketCommunication.Controllers
 {
@@ -33,21 +35,15 @@ namespace WebSocketCommunication.Controllers
 
         private async Task GetMessages(HttpContext context, WebSocket webSocket)
         {
-            var messages = new[]
-            {
-            "Message1",
-            "Message2",
-            "Message3",
-            "Message4",
-            "Message5"
-        };
+            var tableModel = new TableModel(1000, 3);
+            var table = tableModel.GenerateTable();
 
-            foreach (var message in messages)
+            foreach (var row in table)
             {
-                var bytes = Encoding.ASCII.GetBytes(message);
+                var serializedRow = JsonConvert.SerializeObject(row);
+                var bytes = Encoding.ASCII.GetBytes(serializedRow);
                 var arraySegment = new ArraySegment<byte>(bytes);
                 await webSocket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
-                Thread.Sleep(2000);
             }
 
             await webSocket.SendAsync(new ArraySegment<byte>(null), WebSocketMessageType.Binary, false, CancellationToken.None);
