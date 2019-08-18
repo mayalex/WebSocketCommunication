@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebSocketCommunication.Controllers
@@ -9,36 +13,44 @@ namespace WebSocketCommunication.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private static string[] Summaries = new[]
+        // GET api/values
+        [HttpGet]
+        public async Task Get()
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+            var context = ControllerContext.HttpContext;
+            var isSocketRequest = context.WebSockets.IsWebSocketRequest;
 
-        [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            if (isSocketRequest)
             {
-                DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            });
+                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                await GetMessages(context, webSocket);
+            }
+            else
+            {
+                context.Response.StatusCode = 400;
+            }
         }
 
-        public class WeatherForecast
+        private async Task GetMessages(HttpContext context, WebSocket webSocket)
         {
-            public string DateFormatted { get; set; }
-            public int TemperatureC { get; set; }
-            public string Summary { get; set; }
-
-            public int TemperatureF
+            var messages = new[]
             {
-                get
-                {
-                    return 32 + (int)(TemperatureC / 0.5556);
-                }
+            "Message1",
+            "Message2",
+            "Message3",
+            "Message4",
+            "Message5"
+        };
+
+            foreach (var message in messages)
+            {
+                var bytes = Encoding.ASCII.GetBytes(message);
+                var arraySegment = new ArraySegment<byte>(bytes);
+                await webSocket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
+                Thread.Sleep(2000);
             }
+
+            await webSocket.SendAsync(new ArraySegment<byte>(null), WebSocketMessageType.Binary, false, CancellationToken.None);
         }
     }
 }
