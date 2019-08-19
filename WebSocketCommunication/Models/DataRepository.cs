@@ -1,17 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebSocketCommunication.Models;
+﻿using System.Data;
 
 namespace WebSocketCommunication.Models
 {
     public class DataRepository : IDataRepository
     {
-        public Table GenerateTable(int rows, int cols)
+        private readonly DataTable _dataTable;
+        public DataTable Data => _dataTable;
+        public DataRepository()
         {
-            var tableModel = new Table(10000, 3);
-            return tableModel.GenerateTable();
+            if (_dataTable == null)
+            {
+                _dataTable = Table.GenerateTable(100);
+            }
+        }
+
+        public void Delete(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public DataRow Update(int id, DataRow row)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public DataRow Insert(DataRow row)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

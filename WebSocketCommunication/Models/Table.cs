@@ -1,51 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace WebSocketCommunication.Models
-{
+{  
     public class Table
     {
-        private int RowsAmount { get; set; }
-        private int ColsAmount { get; set; }
-        private static Random random = new Random();
+        private static readonly Random Random = new Random();
 
-        public Table(int rows, int cols)
-        {
-            RowsAmount = rows;
-            ColsAmount = cols;
-        }
+        protected Table() { }
 
-        public List<List<string>> GenerateTable()
+        public static DataTable GenerateTable(int rows)
         {
-            var table = new List<List<string>>();
-            for (int i = 0; i < RowsAmount; i++)
+            var table = new DataTable();
+            table.Columns.Add("id", typeof(int));
+            table.Columns.Add("stringColumn", typeof(string));
+            table.Columns.Add("date", typeof(DateTime));
+
+            for (var i = 0; i < rows; i++)
             {
-                table.Add(GenerateRow(i));
+                table.Rows.Add(i, RandomString(15), DateTime.Now);
             }
+
             return table;
         }
 
-        private List<string> GenerateRow(int id)
-        {
-            var row = new List<string>();
-            row.Add(id.ToString());
-            for (int i = 1; i < ColsAmount; i++)
-            {
-                row.Add(RandomString(10));
-            }
-            return row;
-        }
-
-        public string RandomString(int length)
+        private static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Range(1, length).Select(_ => chars[random.Next(chars.Length)]).ToArray());
-        }
-        private class TableRow
-        {
-            private int RowID { get; set; }
-            public string Col { get; set; }
+            return new string(Enumerable.Range(1, length).Select(_ => chars[Random.Next(chars.Length)]).ToArray());
         }
     }
 }
