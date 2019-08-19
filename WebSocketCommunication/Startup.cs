@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebSocketCommunication.Models;
 
 namespace WebSocketCommunication
 {
@@ -26,6 +27,7 @@ namespace WebSocketCommunication
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            services.AddSingleton<IDataRepository, DataRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

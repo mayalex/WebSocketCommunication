@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace WebSocketCommunication.Models
 {
-    public class TableModel
+    public class Table
     {
         private int RowsAmount { get; set; }
         private int ColsAmount { get; set; }
         private static Random random = new Random();
 
-        public TableModel(int rows, int cols)
+        public Table(int rows, int cols)
         {
             RowsAmount = rows;
             ColsAmount = cols;
@@ -41,11 +41,6 @@ namespace WebSocketCommunication.Models
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Range(1, length).Select(_ => chars[random.Next(chars.Length)]).ToArray());
-        }
-
-        private class Table
-        {
-            private TableRow Row { get; set; }
         }
         private class TableRow
         {
